@@ -5,7 +5,7 @@ namespace StockCore.Entities
 {
     public partial class Product
     {
-        public int ProductId { get; set; }
+        public int? ProductId { get; set; }
         public string Name { get; set; } = null!;
         public string? Image { get; set; }
         public int Stock { get; set; }
@@ -13,7 +13,7 @@ namespace StockCore.Entities
         public DateTime Created { get; set; }
         public int CategoryId { get; set; }
 
-        public virtual Category Category { get; set; } = null!;
+        public virtual Category Category { get; set; }
         //internal virtual Category Category { get; set; } = null!;
     }
 }
