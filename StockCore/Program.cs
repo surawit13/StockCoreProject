@@ -5,21 +5,39 @@ using StockCore.Data;
 using Mapster;
 using StockCore.Interfaces;
 using StockCore.Services;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using StockCore.AutoFac;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //builder.Services.AddMapster();
+
+//option 1 using autofac and install service auto if  lastname is contains "Service"
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
+{
+    builder.RegisterAssemblyTypes(Assembly.GetEntryAssembly())
+    .Where(t => t.Name.EndsWith("Service"))
+    .AsImplementedInterfaces();
+});
+
 builder.Services.AddDbContext<DatabaseContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("Local_Mssql")));
-builder.Services.AddTransient<IProductService, ProductService>();
-//builder.Services.AddTransient<ProductService, IProductService>();
+
+//option 2 manully resigter service
+//builder.Services.AddTransient<IProductService, ProductService>(); // basic register services
+
 
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 var app = builder.Build();
 

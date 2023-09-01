@@ -56,7 +56,11 @@ namespace StockCore.Controllers
             //    return NotFound();
             //}
             //return ProductResponse.FromProduct(res);
-
+            if (id < 0)
+            {
+                return NotFound();
+               
+            }
             var product = await productService.FindById(id);
             //query on ly one data , if null then return null
 

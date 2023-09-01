@@ -51,7 +51,7 @@ namespace StockCore.Services
             //res.Username = model.Username;
             //res.Password = model.Password;
             databaseContext.Products.Remove(product);
-            databaseContext.SaveChangesAsync();
+            await databaseContext.SaveChangesAsync();
             //return NoContent();
         }
 
@@ -68,6 +68,7 @@ namespace StockCore.Services
 
         public async Task<Product> FindById(int id)
         {
+
             //throw new NotImplementedException();
             return await  databaseContext.Products.Include(p => p.Category)
                 .SingleOrDefaultAsync(p => p.ProductId == id);
