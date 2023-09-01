@@ -3,12 +3,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using StockCore.Data;
 using Mapster;
+using StockCore.Interfaces;
+using StockCore.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //builder.Services.AddMapster();
 builder.Services.AddDbContext<DatabaseContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("Local_Mssql")));
+builder.Services.AddTransient<IProductService, ProductService>();
+//builder.Services.AddTransient<ProductService, IProductService>();
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
