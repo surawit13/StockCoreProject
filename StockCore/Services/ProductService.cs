@@ -10,8 +10,13 @@ namespace StockCore.Services
     public class ProductService : IProductService
     {
         private readonly DatabaseContext databaseContext;
+        private readonly IUploadFileService uploadFileService;
 
-        public ProductService(DatabaseContext databaseContext) => this.databaseContext = databaseContext;
+        public ProductService(DatabaseContext databaseContext,IUploadFileService uploadFileService)
+        {
+            this.databaseContext = databaseContext;
+            this.uploadFileService = uploadFileService;
+        }
         
 
         public async Task Create(Product product)
@@ -91,6 +96,24 @@ namespace StockCore.Services
             //throw new NotImplementedException();
             var res = databaseContext.Products.Update(product);
             await databaseContext.SaveChangesAsync();
+        }
+
+        public async Task<(string errorMessage, string imageName)> UploadImage(List<IFormFile> formFiles)
+        {
+            //throw new NotImplementedException();
+            String errorMessage = String.Empty;
+            String ImageName = String.Empty;
+            if (uploadFileService.IsUpload(formFiles))
+            {
+                errorMessage = uploadFileService.Validation(formFiles);
+                if (String.IsNullOrEmpty(errorMessage))
+                {
+                    ImageName = (await uploadFileService.UploadImages(formFiles))[0];
+
+                }
+            }
+            return (errorMessage, ImageName);
+
         }
     }
 }

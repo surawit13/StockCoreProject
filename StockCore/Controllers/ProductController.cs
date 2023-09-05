@@ -101,6 +101,11 @@ namespace StockCore.Controllers
         {
             try
             {
+                (string errorMesaage, string imageName) = await productService.UploadImage(productRequest.FormFiles);
+                if(!String.IsNullOrEmpty(errorMesaage))
+                {
+                    return BadRequest();
+                }
                 var product = new Product
                 {
                     ProductId = productRequest.ProductId,
@@ -108,6 +113,7 @@ namespace StockCore.Controllers
                     Stock = productRequest.Stock,
                     Price = productRequest.Price,
                     CategoryId = productRequest.CategoryId,
+                    Image = imageName,
                     //FormFiles = productRequest.FormFilesame
                 };
 
@@ -119,7 +125,7 @@ namespace StockCore.Controllers
                 ////return StatusCode(201);
                 ////return Ok();
                 //return StatusCode((int)HttpStatusCode.Created);
-
+                //product.Image = imageName;
                 await productService.Create(product);
                 //productService.SaveChang();
                 //return StatusCode(201);
@@ -170,6 +176,17 @@ namespace StockCore.Controllers
             if (res == null)
             {
                 return NotFound();
+            }
+
+            (string errorMesaage, string imageName) = await productService.UploadImage(productRequest.FormFiles);
+            if (!String.IsNullOrEmpty(errorMesaage))
+            {
+                return BadRequest();
+            }
+            if (!String.IsNullOrEmpty(imageName))
+            {
+                res.Image = imageName;
+                //return BadRequest();
             }
             //res.Name = productRequest.Name;
             //res.Price = productRequest.Price;

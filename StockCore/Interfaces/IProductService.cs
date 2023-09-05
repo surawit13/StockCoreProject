@@ -11,5 +11,6 @@ namespace StockCore.Interfaces
         Task Update(int id ,Product product);
         Task Delete(Product product);
         Task<IEnumerable<Product>> Search(string name);
+        Task<(string errorMessage, string imageName)> UploadImage(List<IFormFile> formFiles);
     }
 }

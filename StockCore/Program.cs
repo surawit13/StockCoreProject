@@ -50,6 +50,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles(); /// add url can access folder  images in wwwroot/  "https://localhost:44385/images/06e03abc-4abf-4c66-adea-13b4a99cd737.jpg"
 app.UseAuthorization();
 
 app.MapControllers();
