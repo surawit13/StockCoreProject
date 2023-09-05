@@ -12,11 +12,13 @@ using Microsoft.CodeAnalysis;
 using System.Xml.Linq;
 using StockCore.Interfaces;
 using StockCore.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace StockCore.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles ="Admin, Cashier")]
     public class ProductController : ControllerBase
     {
         private readonly IProductService productService;
@@ -82,7 +84,6 @@ namespace StockCore.Controllers
 
         }
         [HttpGet("search")]
-
         public async Task<ActionResult<IEnumerable<ProductResponse>>> SearchProduct([FromQuery] string name = "")
         {
             //var res = _dbContext.Products.Include(p => p.Category)
@@ -95,7 +96,6 @@ namespace StockCore.Controllers
             return res;
 
         }
-
         [HttpPost]
         public async Task<ActionResult<Product>> AddProductBy([FromForm] ProductRequest productRequest)
         {
@@ -202,7 +202,6 @@ namespace StockCore.Controllers
             //_dbContext.SaveChanges();
             return NoContent();
         }
-
         // DELETE api/<AccountController>/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAccount(int id)

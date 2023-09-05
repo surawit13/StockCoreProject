@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StockCore.Data;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using StockCore.DTOs.Account;
 using StockCore.Entities;
+using StockCore.Interfaces;
+using StockCore.Services;
 using System.Net;
-using System.Net.Mail;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace StockCore.Controllers
 {
@@ -13,108 +13,67 @@ namespace StockCore.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly DatabaseContext _databaseContext;
-        public AccountController(DatabaseContext databaseContext)
-        {
-            this._databaseContext = databaseContext;
-        }
-        // GET: api/<AccountController>
-        [HttpGet]
-        public ActionResult<IEnumerable<Account>> GetAccount()
-        {
-            //var accountvalues = _databaseContext.Accounts.OrderByDescending( c => c.AccountId).ToList();
-            var result = _databaseContext.Accounts.OrderBy(c => c.AccountId).ToList();
+        private readonly IAccountService accountService;
 
-            //return _databaseContext.Accounts.OrderbyDescending(p => p.)ToList();
-            return result;
-            //return new string[] { "value1", "value2" };
+        public AccountController(IAccountService accountService)
+        {
+            this.accountService = accountService;
         }
 
-        // GET api/<AccountController>/5
-        [HttpGet("{id}")]
-        public ActionResult<Account> GetByid(int id)
-        {
-            //var accountvalues = _databaseContext.Accounts.Where(v => v.RoleId == id).ToList();
-            var result = _databaseContext.Accounts.Find(id);
-            if(result==null)
-            {
-                return NotFound();
-            }
-            return result;
-        }
-        [HttpGet("search")]
-        public ActionResult<IEnumerable<Account>> Search([FromQuery] string name="")
-        {
-            //var accountvalues = _databaseContext.Accounts.Where(v => v.RoleId == id).ToList();
-            var result = _databaseContext.Accounts
-                .Where(a => a.Username.ToLower().Contains(name.ToLower()))
-      
-                .ToList();
-            if (result == null)
-            {
-                return NotFound();
-            }
-            return result;
-        }
 
-        // POST api/<AccountController>
-        [HttpPost]
-        public ActionResult<Account> AddAccount([FromForm] Account model)
+        [HttpPost("[action]")]
+        public async Task<ActionResult> Register(RegisterRequest registerRequest)
         {
-            try
-            {
-                _databaseContext.Accounts.Add(model);
-                _databaseContext.SaveChanges();
-                //return StatusCode(201);
-                //return Ok();
-                return StatusCode((int)HttpStatusCode.Created);
-            }
-            catch(Exception e)
-            {
-                throw (e);
-            }
-            
+            var account = new Account { 
+
+                Username = registerRequest.username,
+                Password = registerRequest.password,
+                RoleId = registerRequest.roleid
+
+            };
+
+            await accountService.Register(account);
+            return StatusCode((int) HttpStatusCode.Created);
         }
-
-        // PUT api/<AccountController>/5
-        [HttpPut("{id}")]
-        public ActionResult<Account> UpdateAccount(int id, [FromForm] Account model)
-        {
-            if(id != model.AccountId)
-            {
-                return BadRequest();
-            }
-            var res = _databaseContext.Accounts.Find(id);
-
-            if (res == null)
-            {
-                return NotFound();
-            }
-            res.Username = model.Username;
-            res.Password = model.Password;
-            _databaseContext.Accounts.Update(res);
-            _databaseContext.SaveChanges();
-            return NoContent();
-        }
-
-        // DELETE api/<AccountController>/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteAccount(int id)
-        {
    
-            var res = _databaseContext.Accounts.Find(id);
+        [HttpPost("[action]")]
+        public async Task<ActionResult> Login(LoginRequest loginRequest)
+        {
+                //var account = new Account
+                //{
 
-            if (res == null)
+                //    Username = loginRequest.username,
+                //    Password = loginRequest.password,
+
+                //};
+                var acc = await accountService.Login(loginRequest.username, loginRequest.password);
+                if(acc == null)
+                {
+                    return Unauthorized();
+                }
+
+
+                return Ok(new
+                {
+                    //token = "sdfsfsfsadfasf" 
+                    token = accountService.GenerateToken(acc)
+                });
+        }
+        [HttpGet("[action]")] //enotation
+        public async Task<ActionResult> Info(LoginRequest loginRequest)
+        {
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            if(accessToken == null)
             {
-                return NotFound();
+                return Unauthorized();
             }
-            //res.Username = model.Username;
-            //res.Password = model.Password;
-            _databaseContext.Accounts.Remove(res);
-            _databaseContext.SaveChanges();
-            return NoContent();
+
+            var account = accountService.GetInfo(accessToken);
+            return Ok(new
+            {
+                username = account.Username,
+                role = account.Role.Name
+            });
         }
     }
-
-   
 }

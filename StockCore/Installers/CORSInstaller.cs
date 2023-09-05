@@ -1,6 +1,6 @@
 ﻿namespace StockCore.Installers
 {
-    public class CORSInstallere : IInstaller
+    public class CORSInstaller : IInstaller
     {
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {

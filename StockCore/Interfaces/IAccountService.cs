@@ -7,7 +7,9 @@ namespace StockCore.Interfaces
         Task Register(Account account);
         //Task Unregister(Account account);
         //Task Delete(Account account);
-        Task Login(string username, string password);
+        Task<Account> Login(string username, string password);
 
+        string GenerateToken (Account account);
+        Account GetInfo(string accessToKen);
     }
 }
