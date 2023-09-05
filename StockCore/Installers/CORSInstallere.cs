@@ -8,7 +8,9 @@
             {
                 options.AddPolicy("AllowSpecificOrigins", builder =>
                 {
-                    builder.WithOrigins("https://www.w3schools.com", "https://localhost.com:4200")
+                    builder.WithOrigins(
+                        "https://www.w3schools.com", 
+                        "https://localhost.com:4200")
                     .AllowAnyHeader()
                     .AllowAnyMethod();
                 });
