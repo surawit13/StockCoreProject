@@ -9,6 +9,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using StockCore.AutoFac;
 using System.Reflection;
+using StockCore.Installers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,18 +25,19 @@ builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
     .AsImplementedInterfaces();
 });
 
-builder.Services.AddDbContext<DatabaseContext>(options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Local_Mssql")));
+//builder.Services.AddDbContext<DatabaseContext>(options => 
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("Local_Mssql")));
+builder.Services.InstallServiceInAssembly(builder.Configuration);
 
 //option 2 manully resigter service
 //builder.Services.AddTransient<IProductService, ProductService>(); // basic register services
 
 
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
 
 
@@ -51,6 +53,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles(); /// add url can access folder  images in wwwroot/  "https://localhost:44385/images/06e03abc-4abf-4c66-adea-13b4a99cd737.jpg"
+app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
 
 app.MapControllers();
